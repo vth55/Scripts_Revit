@@ -716,18 +716,23 @@ class MainWindow(forms.WPFWindow):
         self._edit_entries = []
         self._edit_bulk_targets = []
         self._edit_dirty = True
+        self._edit_initialized = False
         self._edit_last_search = None
         self._edit_last_view_id = None
         self._clean_filter_map = {}
+        self._clean_initialized = False
         self._exp_map = {}
         self._imp_data = []
+        self._transfer_initialized = False
         self._schemes = []
         self._scheme_items = []
         self._current_scheme = None
         self._scheme_bulk_targets = []
         self._schemes_dirty = True
+        self._schemes_initialized = False
         self._colors = []
         self._color_syncing = False
+        self._colors_initialized = False
         forms.WPFWindow.__init__(self, 'main_window.xaml')
         self._ui_loading = False
         self._wire_live_search_events()
@@ -735,11 +740,6 @@ class MainWindow(forms.WPFWindow):
         self._init_header()
         self._init_create_page()
         self._init_file_page()
-        self._init_edit_page()
-        self._init_transfer_page()
-        self._init_clean_page()
-        self._init_schemes_page()
-        self._init_colors_page()
         self.mainTabs.SelectedIndex = 0
 
     def _wire_live_search_events(self):
@@ -806,22 +806,27 @@ class MainWindow(forms.WPFWindow):
         self._nav(1, u"Listas Excel / CSV")
 
     def nav_edit(self, s, a):
+        self._ensure_edit_page_initialized()
         self._refresh_edit_page()
         self._nav(2, u"Editar filtros existentes")
 
     def nav_transfer(self, s, a):
+        self._ensure_transfer_page_initialized()
         self._transfer_load_project_filters()
         self._nav(4, u"Transferir filtros")
 
     def nav_clean(self, s, a):
+        self._ensure_clean_page_initialized()
         self.l_procurar(None, None)
         self._nav(5, u"Limpar filtros")
 
     def nav_schemes(self, s, a):
+        self._ensure_schemes_page_initialized()
         self._schemes_refresh()
         self._nav(3, u"Biblioteca de esquemas")
 
     def nav_colors(self, s, a):
+        self._ensure_colors_page_initialized()
         self._refresh_colors_page()
         self._nav(6, u"Configurar paleta")
 
@@ -933,9 +938,55 @@ class MainWindow(forms.WPFWindow):
     def _refresh_filter_pages(self):
         try:
             self._edit_dirty = True
-            self._refresh_edit_page(True)
+            if self._edit_initialized:
+                self._refresh_edit_page(True)
         except Exception:
             pass
+        try:
+            if self._transfer_initialized:
+                self._transfer_load_project_filters()
+        except Exception:
+            pass
+        try:
+            if self._clean_initialized:
+                self.l_procurar(None, None)
+        except Exception:
+            pass
+        try:
+            if self._schemes_initialized:
+                self._schemes_dirty = True
+        except Exception:
+            pass
+
+    def _ensure_edit_page_initialized(self):
+        if self._edit_initialized:
+            return
+        self._init_edit_page()
+        self._edit_initialized = True
+
+    def _ensure_transfer_page_initialized(self):
+        if self._transfer_initialized:
+            return
+        self._init_transfer_page()
+        self._transfer_initialized = True
+
+    def _ensure_clean_page_initialized(self):
+        if self._clean_initialized:
+            return
+        self._init_clean_page()
+        self._clean_initialized = True
+
+    def _ensure_schemes_page_initialized(self):
+        if self._schemes_initialized:
+            return
+        self._init_schemes_page()
+        self._schemes_initialized = True
+
+    def _ensure_colors_page_initialized(self):
+        if self._colors_initialized:
+            return
+        self._init_colors_page()
+        self._colors_initialized = True
 
     def _get_cached_filterable_categories(self):
         if self._filterable_categories_cache is None:
@@ -1893,6 +1944,7 @@ class MainWindow(forms.WPFWindow):
     def _init_edit_page(self):
         self._fill_apply_target_options(self.cmbEditApplyTarget, False)
         self._refresh_edit_page(True)
+        self._edit_initialized = True
 
     def _edit_build_pattern_options(self):
         self._edit_pattern_options = [
@@ -2265,6 +2317,7 @@ class MainWindow(forms.WPFWindow):
     # Export/import
     def _init_transfer_page(self):
         self._transfer_load_project_filters()
+        self._transfer_initialized = True
 
     def _transfer_load_project_filters(self):
         selected = set(str(i) for i in self.x_lstExpFilters.SelectedItems)
@@ -2476,6 +2529,7 @@ class MainWindow(forms.WPFWindow):
         self.l_rdoProject.Checked += lambda s, a: self._clean_update_scope()
         self._clean_update_scope()
         self.l_procurar(None, None)
+        self._clean_initialized = True
 
     def _clean_update_scope(self):
         if self.l_rdoView.IsChecked:
@@ -2574,6 +2628,7 @@ class MainWindow(forms.WPFWindow):
     # Schemes
     def _init_schemes_page(self):
         self._schemes_refresh(True)
+        self._schemes_initialized = True
 
     def _scheme_search_text(self):
         try:
@@ -3003,6 +3058,7 @@ class MainWindow(forms.WPFWindow):
     # Colors
     def _init_colors_page(self):
         self._refresh_colors_page()
+        self._colors_initialized = True
 
     def _refresh_colors_page(self):
         selected_keys = []

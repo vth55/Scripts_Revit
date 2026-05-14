@@ -490,8 +490,11 @@
                             </Border>
                             <DataGrid Grid.Row="2" x:Name="e_dgFiltros" AutoGenerateColumns="False"
                                       CanUserAddRows="False" CanUserDeleteRows="False"
-                                      EnableRowVirtualization="False"
-                                      EnableColumnVirtualization="False"
+                                      EnableRowVirtualization="True"
+                                      EnableColumnVirtualization="True"
+                                      VirtualizingPanel.IsVirtualizing="True"
+                                      VirtualizingPanel.VirtualizationMode="Recycling"
+                                      ScrollViewer.CanContentScroll="True"
                                       SelectionMode="Extended" SelectionUnit="FullRow"
                                       PreviewMouseRightButtonDown="e_grid_right_click">
                                 <DataGrid.ContextMenu>
@@ -630,8 +633,11 @@
                                         </DockPanel>
                                         <DataGrid Grid.Row="2" x:Name="sch_dgItems" AutoGenerateColumns="False"
                                                   CanUserAddRows="False" CanUserDeleteRows="False"
-                                                  EnableRowVirtualization="False"
-                                                  EnableColumnVirtualization="False"
+                                                  EnableRowVirtualization="True"
+                                                  EnableColumnVirtualization="True"
+                                                  VirtualizingPanel.IsVirtualizing="True"
+                                                  VirtualizingPanel.VirtualizationMode="Recycling"
+                                                  ScrollViewer.CanContentScroll="True"
                                                   SelectionMode="Extended" SelectionUnit="FullRow"
                                                   PreviewMouseRightButtonDown="sch_grid_right_click">
                                             <DataGrid.ContextMenu>
