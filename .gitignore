@@ -5,3 +5,13 @@ __pycache__/
 *.user
 *.tmp
 Thumbs.db
+/bundle.yaml
+/excel_io.py
+/icon.png
+/main_window.xaml
+/main_window_logic.py
+/palette_helpers.py
+/picker_cor.xaml
+/scheme_helpers.py
+/script.py
+/text_input.xaml
