@@ -65,8 +65,6 @@ Depois disso, o botao deve aparecer em:
 
 Nao e preciso ter conta GitHub.
 
-Tambem nao e preciso saber usar Git.
-
 Basta:
 
 1. abrir o repositorio no GitHub
