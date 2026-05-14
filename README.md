@@ -8,6 +8,7 @@ Este repositorio ja inclui uma pasta pronta a copiar para o pyRevit:
 
 ```text
 Scripts.extension/
+  lib/
   Scripts.tab/
     Ferramentas.panel/
       Filters.pushbutton/
