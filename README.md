@@ -37,21 +37,23 @@ Links uteis:
 
 1. Instalar o pyRevit.
 2. Fechar o Revit.
-3. Descarregar este repositorio.
-4. Copiar a pasta `Scripts.extension` deste repositorio para:
+3. Abrir este repositorio no GitHub.
+4. Clicar em `Code` -> `Download ZIP`.
+5. Extrair o ZIP.
+6. Copiar a pasta `Scripts.extension` extraida do ZIP para:
 
 ```text
 %AppData%\pyRevit\Extensions
 ```
 
-5. O resultado final deve ficar assim:
+7. O resultado final deve ficar assim:
 
 ```text
 %AppData%\pyRevit\Extensions\Scripts.extension\Scripts.tab\Ferramentas.panel\Filters.pushbutton
 ```
 
-6. Abrir o Revit.
-7. Fazer `Reload` no pyRevit, se necessario.
+8. Abrir o Revit.
+9. Fazer `Reload` no pyRevit, se necessario.
 
 Depois disso, o botao deve aparecer em:
 
@@ -61,12 +63,17 @@ Depois disso, o botao deve aparecer em:
 
 ## Instalacao por copia manual
 
-Se o utilizador nao quiser usar Git:
+Nao e preciso ter conta GitHub.
+
+Tambem nao e preciso saber usar Git.
+
+Basta:
 
 1. abrir o repositorio no GitHub
-2. descarregar o ZIP
-3. extrair
-4. copiar a pasta `Scripts.extension` para `%AppData%\pyRevit\Extensions`
+2. clicar em `Code`
+3. clicar em `Download ZIP`
+4. extrair o ZIP
+5. copiar a pasta `Scripts.extension` para `%AppData%\pyRevit\Extensions`
 
 ## Notas
 
