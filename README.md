@@ -107,3 +107,17 @@ C:\Users\NOME\AppData\Roaming\pyRevit\Extensions
 - Este repositorio nao inclui paletas pessoais nem esquemas pessoais.
 - O menu `Transferir filtros` serve para partilhar filtros entre colegas por ficheiro `JSON`.
 - O menu `Esquemas` serve para reutilizacao local no mesmo PC.
+- Se o botao for colocado dentro de outra extensao, por exemplo `Teste.extension`, essa extensao tambem precisa de ter a pasta `lib` na sua raiz:
+
+```text
+Teste.extension/
+  lib/
+    revit_query.py
+    filters_core.py
+    colors_core.py
+  Tools.tab/
+    TopBim.panel/
+      Filters.pushbutton/
+```
+
+- O `Filters.pushbutton` pode estar noutro `tab` ou `panel`, mas a pasta `lib` tem de ficar na raiz da mesma `.extension`.
