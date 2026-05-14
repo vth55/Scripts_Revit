@@ -35,6 +35,17 @@ Links uteis:
 
 ## Instalacao
 
+Metodo mais simples:
+
+1. descarregar o ficheiro `Filters-pyRevit.zip` deste repositorio
+2. extrair o ZIP
+3. copiar a pasta `Scripts.extension`
+4. colar em `%AppData%\\pyRevit\\Extensions`
+
+Ao extrair esse ZIP, a pasta ja fica pronta para copiar.
+
+## Instalacao alternativa pelo ZIP automatico do GitHub
+
 1. Instalar o pyRevit.
 2. Fechar o Revit.
 3. Abrir este repositorio no GitHub.
@@ -70,10 +81,9 @@ Tambem nao e preciso saber usar Git.
 Basta:
 
 1. abrir o repositorio no GitHub
-2. clicar em `Code`
-3. clicar em `Download ZIP`
-4. extrair o ZIP
-5. copiar a pasta `Scripts.extension` para `%AppData%\pyRevit\Extensions`
+2. descarregar `Filters-pyRevit.zip`
+3. extrair o ZIP
+4. copiar a pasta `Scripts.extension` para `%AppData%\pyRevit\Extensions`
 
 ## Notas
 
