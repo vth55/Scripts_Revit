@@ -21,11 +21,10 @@ from Autodesk.Revit.DB import (
     BuiltInParameter, Category, ElementId, ElementParameterFilter,
     FilteredElementCollector, FillPatternElement, LabelUtils,
     OverrideGraphicSettings, ParameterFilterElement, ParameterFilterRuleFactory,
-    ParameterFilterUtilities
+    ParameterFilterUtilities, StorageType, ElementMulticategoryFilter
 )
 from pyrevit import revit, forms
 
-import revit_query, filters_core, colors_core
 import palette_helpers as ph
 reload(ph)
 
@@ -176,7 +175,14 @@ def _get_filterable_categories(doc):
             except Exception:
                 pass
     except Exception:
-        result = revit_query.get_categories(doc)
+        cats = getattr(doc.Settings, 'Categories', None)
+        if cats is not None:
+            for cat in cats:
+                try:
+                    if cat and cat.Name and cat.AllowsBoundParameters:
+                        result[cat.Name] = cat.Id
+                except Exception:
+                    pass
     return result
 
 
@@ -204,6 +210,73 @@ def _get_all_params_with_categories_strict(doc, cat_map):
                 result[pname] = [pid, []]
             result[pname][1].append(cat_id)
     return result
+
+
+def _get_categories_fallback(doc):
+    return _get_filterable_categories(doc)
+
+
+def _get_filterable_params_fallback(doc, cat_ids):
+    return _get_strict_filterable_params(doc, cat_ids)
+
+
+def _param_value_as_text(param):
+    if param is None or not param.HasValue:
+        return None
+    try:
+        text = param.AsString()
+        if text:
+            return text.strip()
+    except Exception:
+        pass
+    try:
+        text = param.AsValueString()
+        if text:
+            return text.strip()
+    except Exception:
+        pass
+    try:
+        stype = param.StorageType
+        if stype == StorageType.Integer:
+            return str(param.AsInteger())
+        if stype == StorageType.Double:
+            return str(param.AsDouble())
+        if stype == StorageType.ElementId:
+            eid = param.AsElementId()
+            if eid and eid != ElementId.InvalidElementId:
+                return str(eid.IntegerValue)
+    except Exception:
+        pass
+    return None
+
+
+def _get_unique_values_fallback(doc, cat_ids, param_id):
+    values = set()
+    if not cat_ids or not param_id:
+        return []
+    try:
+        multi = ElementMulticategoryFilter(List[ElementId](cat_ids))
+        collector = FilteredElementCollector(doc).WherePasses(multi).WhereElementIsNotElementType()
+    except Exception:
+        collector = FilteredElementCollector(doc).WhereElementIsNotElementType()
+    cat_set = set()
+    try:
+        cat_set = set(cid.IntegerValue for cid in cat_ids)
+    except Exception:
+        cat_set = set()
+    for elem in collector:
+        try:
+            if cat_set:
+                cat = getattr(elem, 'Category', None)
+                if cat is None or cat.Id.IntegerValue not in cat_set:
+                    continue
+            param = elem.get_Parameter(param_id)
+            text = _param_value_as_text(param)
+            if text:
+                values.add(text)
+        except Exception:
+            pass
+    return sorted(values)
 
 
 def _validate_override_view(view):
@@ -1155,7 +1228,7 @@ class MainWindow(forms.WPFWindow):
         if not param_id:
             MessageBox.Show(u"Parametro nao encontrado no mapa.", "Filter Manager")
             return
-        self._all_values = revit_query.get_unique_values(
+        self._all_values = _get_unique_values_fallback(
             self.doc, [self._cat_map[c] for c in cats], param_id)
         self._sel_values = set(self._all_values)
         self._render_values("")
@@ -1794,7 +1867,7 @@ class MainWindow(forms.WPFWindow):
             return [], False
         try:
             raw_cat_ids = [self._file_cat_map[c] for c in cats if c in self._file_cat_map]
-            project_vals = set(revit_query.get_unique_values(self.doc, raw_cat_ids, param_id))
+            project_vals = set(_get_unique_values_fallback(self.doc, raw_cat_ids, param_id))
             return [(v, n) for v, n in pairs if v in project_vals], True
         except Exception:
             return [], False
@@ -2459,7 +2532,7 @@ class MainWindow(forms.WPFWindow):
         sel_idx = [self.x_lstImpFilters.Items.IndexOf(i) for i in self.x_lstImpFilters.SelectedItems]
         if not sel_idx:
             MessageBox.Show(u"Selecione filtros para importar.", "Filter Manager"); return
-        cat_map = revit_query.get_categories(self.doc)
+        cat_map = _get_categories_fallback(self.doc)
         ok = 0
         skipped = []
         created_filters = []
@@ -2479,7 +2552,7 @@ class MainWindow(forms.WPFWindow):
                 continue
             pname = rules_lst[0].get('param', '')
             value = rules_lst[0].get('value', '')
-            param_id = revit_query.get_filterable_params(self.doc, cat_ids).get(pname)
+            param_id = _get_filterable_params_fallback(self.doc, cat_ids).get(pname)
             if not param_id:
                 skipped.append(name + u" (parametro nao encontrado)")
                 continue
@@ -2982,7 +3055,7 @@ class MainWindow(forms.WPFWindow):
         active_items = [i for i in self._scheme_items if i.Active]
         if not active_items:
             MessageBox.Show(u"O esquema nao tem itens ativos.", "Esquemas"); return
-        cat_map = revit_query.get_categories(self.doc)
+        cat_map = _get_categories_fallback(self.doc)
         fill_patterns = _get_revit_fill_pattern_map(self.doc)
         solid = ph.get_solid_fill_pattern_id(self.doc)
         created = 0
@@ -3018,7 +3091,7 @@ class MainWindow(forms.WPFWindow):
                 continue
             pname = rules[0].get('param', '')
             value = rules[0].get('value', item.Value)
-            param_id = revit_query.get_filterable_params(self.doc, cat_ids).get(pname)
+            param_id = _get_filterable_params_fallback(self.doc, cat_ids).get(pname)
             if not param_id:
                 skipped += 1
                 continue
