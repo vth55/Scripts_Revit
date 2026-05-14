@@ -1,0 +1,917 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MTQ Filter Manager"
+        Width="980" Height="680" MinWidth="860" MinHeight="560"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize"
+        Background="#F3F4F6" FontFamily="Segoe UI" FontSize="12"
+        PreviewKeyDown="main_preview_key_down">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="AccentBrush" Color="#0078D4"/>
+        <SolidColorBrush x:Key="TextBrush" Color="#1F2933"/>
+        <SolidColorBrush x:Key="MutedBrush" Color="#667085"/>
+        <SolidColorBrush x:Key="LineBrush" Color="#D7DCE2"/>
+        <SolidColorBrush x:Key="PanelBrush" Color="#FFFFFF"/>
+
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="BorderBrush" Value="#B8C0CC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="6,0"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="BorderBrush" Value="#B8C0CC"/>
+        </Style>
+        <Style TargetType="ListBox">
+            <Setter Property="BorderBrush" Value="#C8CED6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="MaxHeight" Value="420"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+        </Style>
+        <Style TargetType="DataGrid">
+            <Setter Property="BorderBrush" Value="#C8CED6"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="RowHeight" Value="28"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="MaxHeight" Value="460"/>
+        </Style>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#243447"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <Style x:Key="HintText" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="MinWidth" Value="104"/>
+            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#006CBC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="MinWidth" Value="78"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="#F7F8FA"/>
+            <Setter Property="BorderBrush" Value="#B8C0CC"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="#243447"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+            <Setter Property="Foreground" Value="#A4262C"/>
+            <Setter Property="BorderBrush" Value="#D8A2A5"/>
+        </Style>
+        <Style x:Key="NavButton" TargetType="Button">
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Margin" Value="8,2"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="#D9E2EC"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" Background="{TemplateBinding Background}" CornerRadius="3">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#253B55"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CardPanel" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource PanelBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LineBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="12"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="34"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="#FFFFFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+            <Grid Margin="14,0">
+                <TextBlock x:Name="lblProjectInfo" Text="Projeto e vista ativa"
+                           VerticalAlignment="Center" Style="{StaticResource HintText}"/>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="166"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="#172A3D">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Top" Margin="0,10,0,0">
+                        <TextBlock Text="WORKFLOW" Foreground="#8EA2B8" FontSize="10"
+                                   FontWeight="SemiBold" Margin="18,0,0,8"/>
+                        <Button Style="{StaticResource NavButton}" Click="nav_create">
+                            <DockPanel><TextBlock Text="Criar" Foreground="White"/></DockPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Click="nav_edit">
+                            <DockPanel><TextBlock Text="Editar" Foreground="White"/></DockPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Click="nav_clean">
+                            <DockPanel><TextBlock Text="Limpar" Foreground="White"/></DockPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Click="nav_file">
+                            <DockPanel><TextBlock Text="Listas (Excel / CSV)" Foreground="White"/></DockPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Click="nav_transfer">
+                            <DockPanel><TextBlock Text="Transferir filtros" Foreground="White"/></DockPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,10">
+                        <TextBlock Text="BIBLIOTECA" Foreground="#8EA2B8" FontSize="10"
+                                   FontWeight="SemiBold" Margin="18,0,0,8"/>
+                        <Button Style="{StaticResource NavButton}" Click="nav_schemes">
+                            <DockPanel><TextBlock Text="Esquemas" Foreground="White"/></DockPanel>
+                        </Button>
+                        <Button Style="{StaticResource NavButton}" Click="nav_colors">
+                            <DockPanel><TextBlock Text="Cores" Foreground="White"/></DockPanel>
+                        </Button>
+                        <TextBlock Text="INFO" Foreground="#8EA2B8" FontSize="10"
+                                   FontWeight="SemiBold" Margin="18,10,0,8"/>
+                        <Button Style="{StaticResource NavButton}" Click="nav_about">
+                            <DockPanel><TextBlock Text="Sobre" Foreground="White"/></DockPanel>
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
+            </Border>
+
+            <Border Grid.Column="1" Background="#F3F4F6">
+                <TabControl x:Name="mainTabs" BorderThickness="0" Background="Transparent">
+                    <TabControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type TabItem}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </Style>
+                    </TabControl.ItemContainerStyle>
+
+                    <TabItem>
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                <TextBlock Text="Criar filtros do projeto" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="Crie filtros a partir dos valores ja modelados no projeto, com controlo de parametro, nome e cor."
+                                           Style="{StaticResource HintText}" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="228"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource CardPanel}">
+                                    <DockPanel>
+                                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                                            <TextBlock Text="Modo" Style="{StaticResource SectionTitle}"/>
+                                            <RadioButton x:Name="rdoNormal" Content="Categorias → Parâmetro"
+                                                         IsChecked="True" Checked="mode_changed"
+                                                         Margin="0,0,0,4"/>
+                                            <RadioButton x:Name="rdoInverse" Content="Parâmetro → Categorias"
+                                                         Checked="mode_changed"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="lblCatHeader" DockPanel.Dock="Top"
+                                                   Text="1. Categorias" Style="{StaticResource SectionTitle}"/>
+                                        <TextBox x:Name="txtCatFilter" DockPanel.Dock="Top" Text="pesquisar..."
+                                                 Foreground="Gray" GotFocus="cat_search_got_focus"
+                                                 LostFocus="cat_search_lost_focus" TextChanged="cat_filter_changed"/>
+                                        <ListBox x:Name="lstCategories" Margin="0,8,0,0" SelectionMode="Extended"
+                                                 SelectionChanged="cats_selection_changed"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                                    </DockPanel>
+                                </Border>
+                                <Border Grid.Column="2" Style="{StaticResource CardPanel}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Grid Grid.Row="0" Margin="0,0,0,12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="16"/>
+                                                <ColumnDefinition Width="140"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="2. Parametro" Style="{StaticResource SectionTitle}"/>
+                                                <ComboBox x:Name="cmbParam" SelectionChanged="param_changed"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2">
+                                                <TextBlock Text="Prefixo" Style="{StaticResource SectionTitle}"/>
+                                                <TextBox x:Name="txtPrefix" ToolTip="Exemplo: ARQ_, EST_ ou vazio"/>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Grid Grid.Row="1" Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="8"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="6"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Grid.Column="0" Style="{StaticResource SectionTitle}" VerticalAlignment="Center">
+                                                <Run Text="3. Valores "/><Run x:Name="runValueCount" Text="" Foreground="#667085"/>
+                                            </TextBlock>
+                                            <TextBox Grid.Column="2" x:Name="txtValueFilter"
+                                                     Text="pesquisar..." Foreground="Gray"
+                                                     GotFocus="val_search_got_focus" LostFocus="val_search_lost_focus"
+                                                     TextChanged="value_filter_changed"/>
+                                            <Button Grid.Column="4" Content="Todos" Style="{StaticResource SecondaryButton}"
+                                                    Click="select_all"/>
+                                            <Button Grid.Column="6" Content="Nenhum" Style="{StaticResource SecondaryButton}"
+                                                    Click="clear_all"/>
+                                            <Button Grid.Column="8" Content="Detetar" Style="{StaticResource SecondaryButton}"
+                                                    Click="detect_values"/>
+                                        </Grid>
+
+                                        <ListBox Grid.Row="2" x:Name="lstValues" SelectionMode="Extended"
+                                                 SelectionChanged="values_selection_changed"
+                                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox Content="{Binding}"
+                                                              IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected}"/>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+
+                            <Border Grid.Row="2" Style="{StaticResource CardPanel}" Margin="0,12,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <WrapPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="Aparencia:" FontWeight="SemiBold" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                        <RadioButton x:Name="rdoHSV" Content="Automatico HSV" IsChecked="True" Margin="0,0,14,0"
+                                                     Checked="create_color_option_changed"/>
+                                        <RadioButton x:Name="rdoPalette" Content="Paleta" Margin="0,0,14,0"
+                                                     Checked="create_color_option_changed"/>
+                                        <RadioButton x:Name="rdoNoColor" Content="None" Margin="0,0,18,0"
+                                                     Checked="create_color_option_changed"/>
+                                        <TextBlock Text="Aplicar a:" FontWeight="SemiBold" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <ComboBox x:Name="cmbCreateApplyTarget" Width="170" Margin="0,0,8,0"/>
+                                    </WrapPanel>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <TextBlock x:Name="lblStatus" Foreground="#667085"
+                                                   VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <Button Content="Recolorir" Style="{StaticResource SecondaryButton}"
+                                                Click="recolorir_filtros" Margin="0,0,8,0"/>
+                                        <Button Content="Criar filtros" Style="{StaticResource PrimaryButton}"
+                                                Click="criar_filtros"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem>
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                <TextBlock Text="Filtros de ficheiro / Excel" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="Importe CSV ou Excel (.csv, .xlsx, .xlsm, .xls), escolha as colunas certas e crie filtros a partir do ficheiro."
+                                           Style="{StaticResource HintText}" Margin="0,3,0,0"/>
+                            </StackPanel>
+
+                            <Border Grid.Row="1" Style="{StaticResource CardPanel}" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="f_txtFile" IsReadOnly="True" Text="Nenhum ficheiro selecionado..."
+                                             Foreground="Gray" Margin="0,0,8,0"/>
+                                    <Button Grid.Column="1" Content="Procurar" Style="{StaticResource SecondaryButton}"
+                                            Click="f_browse_file"/>
+                                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,10,0,0">
+                                        <TextBlock Text="Valor:" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                        <ComboBox x:Name="f_cmbColVal" Width="168" SelectionChanged="f_col_changed"/>
+                                        <TextBlock Text="Nome:" VerticalAlignment="Center" Margin="18,0,6,0"/>
+                                        <ComboBox x:Name="f_cmbColNome" Width="168" SelectionChanged="f_col_changed"/>
+                                        <TextBlock Text="Prefixo:" VerticalAlignment="Center" Margin="18,0,6,0"/>
+                                        <TextBox x:Name="f_txtPrefix" Width="120"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+
+                            <Expander Grid.Row="2" x:Name="f_expAdvanced" Header="Avancado" IsExpanded="False" Margin="0,0,0,12">
+                                <Border Style="{StaticResource CardPanel}" Padding="12" Margin="0,6,0,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="12"/>
+                                            <ColumnDefinition Width="120"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Row="0" Grid.Column="0" x:Name="f_pnlSheet">
+                                            <TextBlock Text="Folha" Style="{StaticResource SectionTitle}"/>
+                                            <ComboBox x:Name="f_cmbSheet" SelectionChanged="f_sheet_changed"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Grid.Column="2">
+                                            <TextBlock Text="Primeira linha de dados" Style="{StaticResource SectionTitle}"/>
+                                            <TextBox x:Name="f_txtRowStart" Text="1" TextChanged="f_range_changed"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="0" Grid.Column="4">
+                                            <TextBlock Text="Ultima linha de dados" Style="{StaticResource SectionTitle}"/>
+                                            <TextBox x:Name="f_txtRowEnd" TextChanged="f_range_changed"/>
+                                        </StackPanel>
+                                        <WrapPanel Grid.Row="1" Grid.ColumnSpan="5" Margin="0,12,0,0">
+                                            <CheckBox x:Name="f_chkTrimText" Content="Limpar espacos e caracteres invisiveis"
+                                                      IsChecked="True" Checked="f_cleaning_changed" Unchecked="f_cleaning_changed"
+                                                      Margin="0,0,18,6"/>
+                                            <CheckBox x:Name="f_chkDropBlankRows" Content="Ignorar linhas vazias"
+                                                      IsChecked="True" Checked="f_cleaning_changed" Unchecked="f_cleaning_changed"
+                                                      Margin="0,0,18,6"/>
+                                            <CheckBox x:Name="f_chkDropEmptyValues" Content="Ignorar valores vazios"
+                                                      IsChecked="True" Checked="f_cleaning_changed" Unchecked="f_cleaning_changed"
+                                                      Margin="0,0,18,6"/>
+                                            <CheckBox x:Name="f_chkDeduplicate" Content="Remover duplicados"
+                                                      IsChecked="True" Checked="f_cleaning_changed" Unchecked="f_cleaning_changed"
+                                                      Margin="0,0,18,6"/>
+                                        </WrapPanel>
+                                        <TextBlock Grid.Row="2" Grid.ColumnSpan="5" x:Name="f_lblSummary"
+                                                   Style="{StaticResource HintText}" Margin="0,12,0,0"/>
+                                        <TextBlock Grid.Row="3" Grid.ColumnSpan="5" x:Name="f_lblIssues"
+                                                   Style="{StaticResource HintText}" Margin="0,6,0,0" Foreground="#A4262C"/>
+                                    </Grid>
+                                </Border>
+                            </Expander>
+
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="225"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="225"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource CardPanel}">
+                                    <DockPanel>
+                                        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                                            <TextBlock Text="Modo" Style="{StaticResource SectionTitle}"/>
+                                            <RadioButton x:Name="f_rdoNormal" Content="Categorias → Parâmetro"
+                                                         IsChecked="True" Checked="f_mode_changed"
+                                                         Margin="0,0,0,4"/>
+                                            <RadioButton x:Name="f_rdoInverse" Content="Parâmetro → Categorias"
+                                                         Checked="f_mode_changed"/>
+                                        </StackPanel>
+                                        <TextBlock x:Name="f_lblCatHeader" DockPanel.Dock="Top" Text="Categorias" Style="{StaticResource SectionTitle}"/>
+                                        <TextBox x:Name="f_txtCatFilter" DockPanel.Dock="Top" Text="pesquisar..."
+                                                 Foreground="Gray" Margin="0,0,0,8"
+                                                 GotFocus="f_cat_search_got_focus"
+                                                 LostFocus="f_cat_search_lost_focus"
+                                                 TextChanged="f_cat_filter_changed"/>
+                                        <ListBox x:Name="f_lstCategories" SelectionMode="Extended"
+                                                 SelectionChanged="f_cats_selection_changed"/>
+                                    </DockPanel>
+                                </Border>
+                                <Border Grid.Column="2" Style="{StaticResource CardPanel}">
+                                    <DockPanel>
+                                        <TextBlock DockPanel.Dock="Top" Text="Parametro Revit" Style="{StaticResource SectionTitle}"/>
+                                        <TextBox x:Name="f_txtParamFilter" DockPanel.Dock="Top" Text="pesquisar..."
+                                                 Foreground="Gray" Margin="0,0,0,6"
+                                                 GotFocus="f_param_search_got_focus"
+                                                 LostFocus="f_param_search_lost_focus"
+                                                 TextChanged="f_param_search_changed"/>
+                                        <ComboBox x:Name="f_cmbParam" DockPanel.Dock="Top" SelectionChanged="f_param_changed"/>
+                                        <TextBlock DockPanel.Dock="Top" Text="Preview" Style="{StaticResource SectionTitle}" Margin="0,14,0,6"/>
+                                        <ListBox x:Name="f_lstPreview" Focusable="False"/>
+                                    </DockPanel>
+                                </Border>
+                                <Border Grid.Column="4" Style="{StaticResource CardPanel}">
+                                    <StackPanel>
+                                        <TextBlock Text="Opcoes" Style="{StaticResource SectionTitle}"/>
+                                        <RadioButton x:Name="f_rdoHSV" Content="Automatico HSV" IsChecked="True" Margin="0,0,0,6"
+                                                     Checked="f_option_changed"/>
+                                        <RadioButton x:Name="f_rdoPalette" Content="Paleta personalizada" Margin="0,0,0,6"
+                                                     Checked="f_option_changed"/>
+                                        <RadioButton x:Name="f_rdoNoColor" Content="None" Margin="0,0,0,12"
+                                                     Checked="f_option_changed"/>
+                                        <CheckBox x:Name="f_chkAplicarVista" Content="Aplicar a vista ativa" IsChecked="False" Margin="0,0,0,6"/>
+                                        <CheckBox x:Name="f_chkScanFilter" Content="So valores existentes no projeto"
+                                                  Checked="f_option_changed" Unchecked="f_option_changed" Margin="0,0,0,6"/>
+                                        <TextBlock x:Name="f_lblStatus" Style="{StaticResource HintText}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <DockPanel Grid.Row="4" LastChildFill="False" Margin="0,12,0,0">
+                                <Button DockPanel.Dock="Right" Content="Criar filtros" Style="{StaticResource PrimaryButton}"
+                                        Click="f_criar_filtros"/>
+                            </DockPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem>
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                <TextBlock Text="Editar filtros existentes" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="Ajuste filtros ja existentes no projeto, incluindo cor, padrao, estado ativo e visibilidade na vista."
+                                           Style="{StaticResource HintText}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <Border Grid.Row="1" Style="{StaticResource CardPanel}" Margin="0,0,0,12">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Left" Text="Pesquisar:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <Button DockPanel.Dock="Right" Content="Carregar" Style="{StaticResource SecondaryButton}" Click="e_carregar"/>
+                                    <TextBox x:Name="e_txtPrefix"/>
+                                </DockPanel>
+                            </Border>
+                            <DataGrid Grid.Row="2" x:Name="e_dgFiltros" AutoGenerateColumns="False"
+                                      CanUserAddRows="False" CanUserDeleteRows="False"
+                                      EnableRowVirtualization="False"
+                                      EnableColumnVirtualization="False"
+                                      SelectionMode="Extended" SelectionUnit="FullRow"
+                                      PreviewMouseRightButtonDown="e_grid_right_click">
+                                <DataGrid.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Renomear filtro" Click="e_rename_filter"/>
+                                        <Separator/>
+                                        <MenuItem Header="Apagar" Foreground="#A4262C" Click="e_delete_filter"/>
+                                    </ContextMenu>
+                                </DataGrid.ContextMenu>
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="Ativo" Width="55" IsReadOnly="True">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Enabled}" HorizontalAlignment="Center"
+                                                          Tag="{Binding}" Click="e_enabled_click"
+                                                          PreviewMouseDown="e_toggle_preview_mouse_down"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Visivel" Width="60" IsReadOnly="True">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding Visible}" HorizontalAlignment="Center"
+                                                          Tag="{Binding}" Click="e_visible_click"
+                                                          PreviewMouseDown="e_toggle_preview_mouse_down"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="Nome do filtro" Binding="{Binding Name}" Width="*" IsReadOnly="True"/>
+                                    <DataGridTemplateColumn Header="Cor" Width="70" IsReadOnly="True">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Background="{Binding ColorBrush}" Click="e_color_btn_click"
+                                                        PreviewMouseDown="e_edit_control_preview_mouse_down"
+                                                        Tag="{Binding}" Margin="4,3" BorderBrush="#888" BorderThickness="1"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Padrão" Width="240" IsReadOnly="True">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ComboBox Loaded="e_fill_pattern_loaded" Height="24" BorderThickness="0">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <DockPanel LastChildFill="True">
+                                                                <Border DockPanel.Dock="Left" Width="42" Height="15"
+                                                                        Margin="0,0,7,0" BorderBrush="#888"
+                                                                        BorderThickness="1" Background="{Binding PreviewBrush}"/>
+                                                                <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                                                            </DockPanel>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <DockPanel Grid.Row="3" LastChildFill="False" Margin="0,12,0,0">
+                                <TextBlock x:Name="e_lblStatus" DockPanel.Dock="Left" Style="{StaticResource HintText}" VerticalAlignment="Center"/>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <TextBlock Text="Aplicar a:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <ComboBox x:Name="cmbEditApplyTarget" Width="170" Margin="0,0,8,0" SelectionChanged="e_target_changed"/>
+                                    <Button Content="Aplicar" Style="{StaticResource PrimaryButton}" Click="e_aplicar"/>
+                                </StackPanel>
+                            </DockPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem>
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                <TextBlock Text="Esquemas" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="Guarde esquemas locais neste PC para voltar a aplicar noutros projetos sem ter de reconstruir o mesmo conjunto."
+                                           Style="{StaticResource HintText}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="240"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource CardPanel}">
+                                    <DockPanel>
+                                        <TextBlock DockPanel.Dock="Top" Text="Biblioteca" Style="{StaticResource SectionTitle}"/>
+                                        <TextBox x:Name="sch_txtSearch" DockPanel.Dock="Top" Text="pesquisar..."
+                                                 Foreground="Gray" Margin="0,0,0,8"
+                                                 GotFocus="sch_search_got_focus"
+                                                 LostFocus="sch_search_lost_focus"
+                                                 TextChanged="sch_search_changed"/>
+                                        <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0">
+                                            <Button Content="Criar da selecao do Editar" Style="{StaticResource SecondaryButton}"
+                                                    Click="sch_create_from_edit_selection" Margin="0,0,0,6"/>
+                                            <Button Content="Duplicar" Style="{StaticResource SecondaryButton}"
+                                                    Click="sch_duplicate" Margin="0,0,0,6"/>
+                                            <Button Content="Apagar" Style="{StaticResource DangerButton}"
+                                                    Click="sch_delete"/>
+                                        </StackPanel>
+                                        <ListBox x:Name="sch_lstSchemes" SelectionMode="Single"
+                                                 SelectionChanged="sch_selection_changed"/>
+                                    </DockPanel>
+                                </Border>
+                                <Border Grid.Column="2" Style="{StaticResource CardPanel}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*"/>
+                                                <ColumnDefinition Width="12"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel>
+                                                <TextBlock Text="Nome do esquema" Style="{StaticResource SectionTitle}"/>
+                                                <TextBox x:Name="sch_txtName"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="2">
+                                                <TextBlock Text="Prefixo" Style="{StaticResource SectionTitle}"/>
+                                                <TextBox x:Name="sch_txtPrefix"/>
+                                            </StackPanel>
+                                        </Grid>
+                                        <DockPanel Grid.Row="1" Margin="0,0,0,10">
+                                            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                                                <CheckBox x:Name="sch_chkApplyView" Content="Aplicar a vista ativa" IsChecked="True" Margin="0,0,18,0"/>
+                                                <CheckBox x:Name="sch_chkReplace" Content="Substituir filtros do esquema" IsChecked="True"/>
+                                            </StackPanel>
+                                            <TextBlock x:Name="sch_lblInfo" DockPanel.Dock="Right" Style="{StaticResource HintText}" VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                        <DataGrid Grid.Row="2" x:Name="sch_dgItems" AutoGenerateColumns="False"
+                                                  CanUserAddRows="False" CanUserDeleteRows="False"
+                                                  EnableRowVirtualization="False"
+                                                  EnableColumnVirtualization="False"
+                                                  SelectionMode="Extended" SelectionUnit="FullRow"
+                                                  PreviewMouseRightButtonDown="sch_grid_right_click">
+                                            <DataGrid.ContextMenu>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Renomear filtro" Click="sch_rename_filter"/>
+                                                </ContextMenu>
+                                            </DataGrid.ContextMenu>
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn Header="Ativo" Width="55" IsReadOnly="True">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <CheckBox IsChecked="{Binding Active}" HorizontalAlignment="Center"
+                                                                      Tag="{Binding}" Click="sch_active_click"
+                                                                      PreviewMouseDown="sch_control_preview_mouse_down"/>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTextColumn Header="Valor" Binding="{Binding Value}" Width="120" IsReadOnly="True"/>
+                                                <DataGridTextColumn Header="Nome do filtro" Binding="{Binding FilterName}" Width="*" IsReadOnly="True"/>
+                                                <DataGridTemplateColumn Header="Cor" Width="70" IsReadOnly="True">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Button Background="{Binding ColorBrush}" Click="sch_color_btn_click"
+                                                                    PreviewMouseDown="sch_control_preview_mouse_down"
+                                                                    Tag="{Binding}" Margin="4,3" BorderBrush="#888" BorderThickness="1"/>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTemplateColumn Header="Padrão" Width="220" IsReadOnly="True">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <ComboBox Loaded="sch_pattern_loaded" Height="24" BorderThickness="0">
+                                                                <ComboBox.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <DockPanel LastChildFill="True">
+                                                                            <Border DockPanel.Dock="Left" Width="42" Height="15"
+                                                                                    Margin="0,0,7,0" BorderBrush="#888"
+                                                                                    BorderThickness="1" Background="{Binding PreviewBrush}"/>
+                                                                            <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                                                                        </DockPanel>
+                                                                    </DataTemplate>
+                                                                </ComboBox.ItemTemplate>
+                                                            </ComboBox>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                            <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,12,0,0">
+                                <TextBlock x:Name="sch_lblStatus" DockPanel.Dock="Left" Style="{StaticResource HintText}" VerticalAlignment="Center"/>
+                                <Button DockPanel.Dock="Right" Content="Aplicar esquema" Style="{StaticResource PrimaryButton}" Click="sch_apply"/>
+                                <Button DockPanel.Dock="Right" Content="Guardar alterações" Style="{StaticResource SecondaryButton}" Click="sch_save_current" Margin="0,0,8,0"/>
+                            </DockPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem>
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                <TextBlock Text="Exportar / Importar filtros" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="Exporte e importe ficheiros JSON para trocar filtros com outros colegas ou outros projetos. Os esquemas ficam neste PC; o JSON serve para partilhar."
+                                           Style="{StaticResource HintText}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <TabControl Grid.Row="1" x:Name="x_tabControl" SelectionChanged="x_tab_changed">
+                                <TabItem Header="Exportar">
+                                    <Grid Margin="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+                                            <TextBox x:Name="x_txtExpSearch" DockPanel.Dock="Left" Width="180"
+                                                     Text="pesquisar..." Foreground="Gray"
+                                                     GotFocus="x_exp_search_focus" LostFocus="x_exp_search_unfocus"
+                                                     TextChanged="x_exp_search_changed"/>
+                                            <Button DockPanel.Dock="Left" Content="Todos" Style="{StaticResource SecondaryButton}"
+                                                    Click="x_exp_select_all" Margin="8,0,0,0"/>
+                                            <Button DockPanel.Dock="Left" Content="Nenhum" Style="{StaticResource SecondaryButton}"
+                                                    Click="x_exp_clear_all" Margin="6,0,0,0"/>
+                                            <TextBlock x:Name="x_lblExpCount" DockPanel.Dock="Right" Style="{StaticResource HintText}"
+                                                       VerticalAlignment="Center"/>
+                                        </DockPanel>
+                                        <ListBox Grid.Row="1" x:Name="x_lstExpFilters" SelectionMode="Extended"
+                                                 SelectionChanged="x_exp_selection_changed"/>
+                                        <CheckBox Grid.Row="2" x:Name="x_chkExpCores" Content="Incluir overrides de vista (cores e padroes)" IsChecked="True" Margin="0,8,0,0"/>
+                                    </Grid>
+                                </TabItem>
+                                <TabItem Header="Importar">
+                                    <Grid Margin="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <DockPanel Grid.Row="0" Margin="0,0,0,8">
+                                            <Button DockPanel.Dock="Right" Content="Procurar" Style="{StaticResource SecondaryButton}" Click="x_browse_import"/>
+                                            <TextBox x:Name="x_txtImpFile" IsReadOnly="True" Text="Nenhum ficheiro JSON selecionado..."
+                                                     Foreground="Gray" Margin="0,0,8,0"/>
+                                        </DockPanel>
+                                        <ListBox Grid.Row="1" x:Name="x_lstImpFilters" SelectionMode="Extended"/>
+                                        <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,8,0,0">
+                                            <Button Content="Todos" Style="{StaticResource SecondaryButton}" Click="x_imp_select_all"/>
+                                            <Button Content="Nenhum" Style="{StaticResource SecondaryButton}" Click="x_imp_clear_all" Margin="6,0,18,0"/>
+                                            <CheckBox x:Name="x_chkImpCores" Content="Importar overrides de vista" IsChecked="True" Margin="0,0,18,0"/>
+                                            <CheckBox x:Name="x_chkImpVista" Content="Aplicar a vista ativa" IsChecked="True"/>
+                                            <TextBlock x:Name="x_lblImpCount" Style="{StaticResource HintText}" Margin="18,0,0,0" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </TabItem>
+                            </TabControl>
+                            <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,12,0,0">
+                                <Button x:Name="x_btnAcao" DockPanel.Dock="Right" Content="Exportar" Style="{StaticResource PrimaryButton}" Click="x_acao_click"/>
+                            </DockPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem>
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                <TextBlock Text="Limpar filtros" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="Remova filtros da vista ativa ou apague filtros do projeto quando ja nao fizerem falta."
+                                           Style="{StaticResource HintText}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <Border Grid.Row="1" Style="{StaticResource CardPanel}" Margin="0,0,0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="Pesquisar:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <TextBox x:Name="l_txtPrefix" Width="220"
+                                                 ToolTip="Procura tolerante por qualquer parte do nome do filtro"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Procurar" Style="{StaticResource SecondaryButton}" Click="l_procurar"/>
+                                </Grid>
+                            </Border>
+                            <Grid Grid.Row="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="200"/>
+                                </Grid.ColumnDefinitions>
+                                <ListBox Grid.Column="0" x:Name="l_lstFilters" SelectionMode="Extended"/>
+                                <Border Grid.Column="1" Style="{StaticResource CardPanel}" Margin="12,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Acao" Style="{StaticResource SectionTitle}"/>
+                                        <RadioButton x:Name="l_rdoView" Content="Remover da vista ativa" IsChecked="True" Margin="0,0,0,8"/>
+                                        <RadioButton x:Name="l_rdoProject" Content="Apagar do projeto" Margin="0,0,0,12"/>
+                                        <TextBlock x:Name="l_lblScope" Style="{StaticResource HintText}" Margin="0,0,0,12"/>
+                                        <Button Content="Selecionar todos" Style="{StaticResource SecondaryButton}" Click="l_select_all" Margin="0,0,0,6"/>
+                                        <Button Content="Limpar selecao" Style="{StaticResource SecondaryButton}" Click="l_clear_sel"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <DockPanel Grid.Row="3" LastChildFill="False" Margin="0,12,0,0">
+                                <TextBlock x:Name="l_lblCount" DockPanel.Dock="Left" Style="{StaticResource HintText}" VerticalAlignment="Center"/>
+                                <Button DockPanel.Dock="Right" Content="Executar limpeza" Style="{StaticResource DangerButton}" Click="l_apagar"/>
+                            </DockPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem>
+                        <Grid Margin="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0" Margin="0,0,0,12">
+                                <TextBlock Text="Paleta de cores" FontSize="18" FontWeight="SemiBold"/>
+                                <TextBlock Text="Defina a paleta usada no modo Paleta e reutilize as mesmas cores no criar, editar e esquemas."
+                                           Style="{StaticResource HintText}" Margin="0,3,0,0"/>
+                            </StackPanel>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="270"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource CardPanel}">
+                                    <DockPanel>
+                                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                                            <Button Content="Subir" Style="{StaticResource SecondaryButton}" Click="co_move_up" Margin="0,0,6,0"/>
+                                            <Button Content="Descer" Style="{StaticResource SecondaryButton}" Click="co_move_down" Margin="0,0,6,0"/>
+                                            <Button Content="Remover" Style="{StaticResource DangerButton}" Click="co_remove_color" Margin="0,0,6,0"/>
+                                            <Button Content="Limpar tudo" Style="{StaticResource DangerButton}" Click="co_clear_all" Margin="0,0,6,0"/>
+                                            <Button Content="Padrão" Style="{StaticResource SecondaryButton}" Click="co_load_defaults"/>
+                                        </StackPanel>
+                                        <ListBox x:Name="co_lstColors" SelectionMode="Extended">
+                                            <ListBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" Height="28">
+                                                        <Border Width="28" Height="18" Background="{Binding HexColor}"
+                                                                BorderBrush="#888" BorderThickness="1" Margin="0,0,8,0"/>
+                                                        <TextBlock Text="{Binding HexColor}" FontFamily="Consolas" Width="78"/>
+                                                        <TextBlock Text="{Binding Label}" Foreground="#667085"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ListBox.ItemTemplate>
+                                        </ListBox>
+                                    </DockPanel>
+                                </Border>
+                                <Border Grid.Column="1" Style="{StaticResource CardPanel}" Margin="12,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="Escolher cor" Style="{StaticResource SectionTitle}"/>
+                                        <TextBlock Text="Atalhos; a paleta guardada e a lista da esquerda."
+                                                   Style="{StaticResource HintText}" Margin="0,0,0,8"/>
+                                        <WrapPanel x:Name="co_basicSwatches" Margin="0,0,0,12"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                            <TextBlock Text="R" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <TextBox x:Name="co_txtR" Width="46" Text="128" TextChanged="co_rgb_text_changed"/>
+                                            <TextBlock Text="G" VerticalAlignment="Center" Margin="8,0,4,0"/>
+                                            <TextBox x:Name="co_txtG" Width="46" Text="128" TextChanged="co_rgb_text_changed"/>
+                                            <TextBlock Text="B" VerticalAlignment="Center" Margin="8,0,4,0"/>
+                                            <TextBox x:Name="co_txtB" Width="46" Text="128" TextChanged="co_rgb_text_changed"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                            <TextBlock Text="#" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <TextBox x:Name="co_txtHex" Text="808080" MaxLength="7" TextChanged="co_hex_text_changed" GotFocus="co_hex_got_focus"/>
+                                        </StackPanel>
+                                        <Border x:Name="co_colorPreview" Height="70" Background="#808080"
+                                                BorderBrush="#888" BorderThickness="1" Margin="0,0,0,12"/>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Content="Misturador..." Style="{StaticResource SecondaryButton}"
+                                                    Click="co_open_mixer" Margin="0,0,8,0"/>
+                                            <Button Content="Adicionar" Style="{StaticResource PrimaryButton}" Click="co_add_color"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <DockPanel Grid.Row="2" LastChildFill="False" Margin="0,12,0,0">
+                                <TextBlock x:Name="co_lblCount" DockPanel.Dock="Left" Style="{StaticResource HintText}" VerticalAlignment="Center"/>
+                                <Button DockPanel.Dock="Right" Content="Guardar paleta" Style="{StaticResource PrimaryButton}" Click="co_save_palette"/>
+                            </DockPanel>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem>
+                        <Grid Margin="16">
+                            <Border Style="{StaticResource CardPanel}" MaxWidth="580" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                <StackPanel>
+                                    <TextBlock Text="MTQ Filter Manager" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                    <TextBlock Text="Versao 1.2" Style="{StaticResource HintText}" Margin="0,0,0,12"/>
+                                    <TextBlock Text="Ferramenta para criar, editar, reutilizar e partilhar filtros de visibilidade no Revit."
+                                               TextWrapping="Wrap" Margin="0,0,0,12"/>
+                                    <TextBlock Text="Autor: Vitor Hugo" Style="{StaticResource HintText}"/>
+                                    <TextBlock Text="Compatibilidade alvo: Revit 2024+ com pyRevit." Style="{StaticResource HintText}"/>
+                                    <TextBlock Text="Formatos suportados: CSV e Excel (.csv, .xlsx, .xlsm, .xls) no importador de listas; JSON (.json) no Exportar / Importar."
+                                               Style="{StaticResource HintText}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Background="#FFFFFF" BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0">
+            <DockPanel Margin="12,0">
+                <TextBlock x:Name="lblGlobalStatus" DockPanel.Dock="Left" Text="Pronto"
+                           Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" FontSize="11"/>
+                <TextBlock DockPanel.Dock="Right" Text="MTQ BIM Tools"
+                           Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center" FontSize="11"/>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>
+
+

@@ -1,0 +1,7 @@
+archive_repo/
+__pycache__/
+*.pyc
+*.pyo
+*.user
+*.tmp
+Thumbs.db
