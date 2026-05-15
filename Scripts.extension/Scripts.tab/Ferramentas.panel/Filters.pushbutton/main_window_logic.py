@@ -799,6 +799,10 @@ class MainWindow(forms.WPFWindow):
 
     def nav_create(self, s, a):
         self._refresh_create_page()
+        try:
+            self.cmbCreateApplyTarget.SelectedItem = APPLY_ACTIVE_VIEW
+        except Exception:
+            pass
         self._nav(0, u"Criar filtros do projeto")
 
     def nav_file(self, s, a):
@@ -1016,6 +1020,10 @@ class MainWindow(forms.WPFWindow):
     # Create from project
     def _init_create_page(self):
         self._fill_apply_target_options(self.cmbCreateApplyTarget, True)
+        try:
+            self.cmbCreateApplyTarget.SelectedItem = APPLY_ACTIVE_VIEW
+        except Exception:
+            pass
         self._cat_map = self._get_cached_filterable_categories()
         self._render_categories("")
 
