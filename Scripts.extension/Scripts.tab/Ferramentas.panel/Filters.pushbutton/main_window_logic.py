@@ -17,6 +17,7 @@ from System.Windows.Media import (
 )
 from System.Windows.Media import Color as WpfColor
 from System.Windows.Input import Key
+from System.Windows.Threading import DispatcherPriority
 from Autodesk.Revit.DB import (
     BuiltInParameter, Category, ElementId, ElementParameterFilter,
     FilteredElementCollector, FillPatternElement, LabelUtils,
@@ -710,6 +711,7 @@ class MainWindow(forms.WPFWindow):
         self._file_preview_ready = True
         self._file_preview_total = 0
         self._file_path = ''
+        self._file_initialized = False
         self._edit_fill_patterns = {}
         self._edit_pattern_names = []
         self._edit_pattern_options = []
@@ -733,13 +735,18 @@ class MainWindow(forms.WPFWindow):
         self._colors = []
         self._color_syncing = False
         self._colors_initialized = False
+        self._warmup_started = False
+        self._warmup_queue = []
         forms.WPFWindow.__init__(self, 'main_window.xaml')
         self._ui_loading = False
         self._wire_live_search_events()
 
         self._init_header()
         self._init_create_page()
-        self._init_file_page()
+        try:
+            self.ContentRendered += self._on_content_rendered
+        except Exception:
+            pass
         self.mainTabs.SelectedIndex = 0
 
     def _wire_live_search_events(self):
@@ -806,6 +813,7 @@ class MainWindow(forms.WPFWindow):
         self._nav(0, u"Criar filtros do projeto")
 
     def nav_file(self, s, a):
+        self._ensure_file_page_initialized()
         self._refresh_file_page()
         self._nav(1, u"Listas Excel / CSV")
 
@@ -968,6 +976,12 @@ class MainWindow(forms.WPFWindow):
         self._init_edit_page()
         self._edit_initialized = True
 
+    def _ensure_file_page_initialized(self):
+        if self._file_initialized:
+            return
+        self._init_file_page()
+        self._file_initialized = True
+
     def _ensure_transfer_page_initialized(self):
         if self._transfer_initialized:
             return
@@ -991,6 +1005,43 @@ class MainWindow(forms.WPFWindow):
             return
         self._init_colors_page()
         self._colors_initialized = True
+
+    def _on_content_rendered(self, sender, args):
+        if self._warmup_started:
+            return
+        self._warmup_started = True
+        self._warmup_queue = [
+            self._ensure_file_page_initialized,
+            self._ensure_edit_page_initialized,
+            self._ensure_schemes_page_initialized,
+            self._ensure_transfer_page_initialized,
+            self._ensure_clean_page_initialized,
+            self._ensure_colors_page_initialized,
+        ]
+        self._queue_next_warmup()
+
+    def _queue_next_warmup(self):
+        if not self._warmup_queue:
+            return
+        try:
+            self.Dispatcher.BeginInvoke(
+                DispatcherPriority.Background,
+                System.Action(self._run_next_warmup))
+        except Exception:
+            try:
+                self._run_next_warmup()
+            except Exception:
+                pass
+
+    def _run_next_warmup(self):
+        if not self._warmup_queue:
+            return
+        step = self._warmup_queue.pop(0)
+        try:
+            step()
+        except Exception:
+            pass
+        self._queue_next_warmup()
 
     def _get_cached_filterable_categories(self):
         if self._filterable_categories_cache is None:
@@ -1338,6 +1389,7 @@ class MainWindow(forms.WPFWindow):
         self.f_lblIssues.Text = u""
         self._file_set_sheet_visibility()
         self._file_load_categories()
+        self._file_initialized = True
 
     def _file_cat_filter_text(self):
         try:
